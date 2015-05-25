@@ -1,0 +1,3 @@
+# strong-executor
+
+StrongLoop Executor

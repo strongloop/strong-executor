@@ -1,0 +1,29 @@
+{
+  "name": "strong-executor",
+  "version": "1.0.0",
+  "description": "StrongLoop Executor",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "eslint ./ && jscs ./",
+    "lint": "eslint ./ && jscs ./",
+    "test": "tap --timeout=200 test/test-*.*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/strongloop/strong-executor.git"
+  },
+  "author": "Strongloop <engineering@strongloop.com>",
+  "license": {
+    "name": "StrongLoop",
+    "url": "https://github.com/strongloop/strong-executor/blob/master/LICENSE.md"
+  },
+  "bugs": {
+    "url": "https://github.com/strongloop/strong-executor/issues"
+  },
+  "homepage": "https://github.com/strongloop/strong-executor",
+  "devDependencies": {
+    "eslint": "^0.21.2",
+    "jscs": "^1.13.1",
+    "tap": "^1.1.0"
+  }
+}
