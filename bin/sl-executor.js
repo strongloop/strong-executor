@@ -10,6 +10,7 @@ process.on('disconnect', function() {
 });
 
 var Parser = require('posix-getopt').BasicParser;
+var defaults = require('strong-url-defaults');
 var mkdirp = require('mkdirp').sync;
 var path = require('path');
 var fs = require('fs');
@@ -29,11 +30,13 @@ var parser = new Parser([
   ':v(version)',
   'h(help)',
   'b:(base)',
+  'd:(driver)',
   'C:(control)',
 ].join(''), process.argv);
 
 var base = '.strong-executor';
-var controlUrl;
+var control = 'http:';
+var driver = 'direct';
 
 var option;
 while ((option = parser.getopt()) !== undefined) {
@@ -49,8 +52,11 @@ while ((option = parser.getopt()) !== undefined) {
     case 'b':
       base = option.optarg;
       break;
+    case 'd':
+      driver = option.optarg;
+      break;
     case 'C':
-      controlUrl = option.optarg;
+      control = option.optarg;
       break;
     default:
       console.error('Invalid usage (near option \'%s\'), try `%s --help`.',
@@ -71,9 +77,16 @@ if (parser.optind() !== process.argv.length) {
 mkdirp(base);
 process.chdir(base);
 
+control = defaults(control, {
+  host: '127.0.0.1',
+  port: 8701,
+});
+
+
 var exec = new Executor({
   cmdName: $0,
-  controlUrl: controlUrl,
+  control: control,
+  driver: driver,
 });
 
 exec.start();

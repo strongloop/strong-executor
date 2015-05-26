@@ -27,12 +27,16 @@
   "devDependencies": {
     "concat-stream": "^1.4.8",
     "eslint": "^0.21.2",
+    "express": "^4.12.4",
+    "express-ws": "^0.2.6",
     "jscs": "^1.13.1",
     "tap": "^1.1.0"
   },
   "dependencies": {
     "debug": "^2.2.0",
     "mkdirp": "^0.5.1",
-    "posix-getopt": "^1.1.0"
+    "posix-getopt": "^1.1.0",
+    "strong-control-channel": "^1.2.1",
+    "strong-url-defaults": "^1.0.0"
   }
 }
