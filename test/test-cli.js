@@ -27,8 +27,6 @@ tap.test('version,-v', function(t) {
 });
 
 tap.test('help', function(t) {
-  var version = require('../package.json').version;
-
   cli('-h').stdout.pipe(concat({encoding: 'string'}, function(line) {
     debug('line <%s>', line);
     t.match(line, /usage:/);

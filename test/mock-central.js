@@ -5,7 +5,6 @@ var assert = require('assert');
 var debug = require('../lib/debug')('test:central');
 var express = require('express');
 var expressWs = require('express-ws');
-var extend = require('util')._extend;
 var http = require('http');
 var url = require('url');
 
@@ -40,11 +39,6 @@ function Central(onRequest, onListening) {
   function _onRequest(req, callback) {
     debug('onRequest: %j', req);
     onRequest(req, callback);
-  }
-
-  function _onNotification(req) {
-    debug('onNotification: %j', req);
-    onRequest(req, function() {});
   }
 }
 

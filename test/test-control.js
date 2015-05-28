@@ -1,7 +1,6 @@
 'use strict';
 
 var Central = require('./mock-central');
-var concat = require('concat-stream');
 var debug = require('./debug');
 var executor = require.resolve('../bin/sl-executor.js');
 var fork = require('child_process').fork;
