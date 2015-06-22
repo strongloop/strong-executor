@@ -7,8 +7,7 @@
     "sl-executor": "./bin/sl-executor.js"
   },
   "scripts": {
-    "pretest": "eslint . && jscs .",
-    "lint": "eslint . && jscs .",
+    "pretest": "eslint --ignore-path .gitignore . && jscs .",
     "test": "tap --timeout=200 test/test-*.*"
   },
   "repository": {
@@ -33,11 +32,14 @@
     "tap": "^1.1.0"
   },
   "dependencies": {
+    "async": "^1.2.1",
     "debug": "^2.2.0",
     "mkdirp": "^0.5.1",
     "posix-getopt": "^1.1.0",
+    "pump": "^1.0.0",
     "request": "^2.57.0",
-    "strong-control-channel": "^1.2.1",
+    "strong-control-channel": "^2.x",
+    "strong-supervisor": "^2.0.2",
     "strong-url-defaults": "^1.0.0",
     "tar": "^2.1.1"
   }
