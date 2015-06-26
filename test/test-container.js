@@ -75,3 +75,8 @@ tap.test('download', function(t) {
     pump(fs.createReadStream(path.resolve(__dirname, 'package.tgz')), res);
   });
 });
+
+// XXX tap.test
+// - start()
+// - destroy()
+// - restart on unexpected exit
