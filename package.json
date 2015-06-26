@@ -15,10 +15,7 @@
     "url": "git://github.com/strongloop/strong-executor.git"
   },
   "author": "Strongloop <engineering@strongloop.com>",
-  "license": {
-    "name": "StrongLoop",
-    "url": "https://github.com/strongloop/strong-executor/blob/master/LICENSE.md"
-  },
+  "license": "LicenseRef-LICENSE.md",
   "bugs": {
     "url": "https://github.com/strongloop/strong-executor/issues"
   },
