@@ -32,11 +32,13 @@ var parser = new Parser([
   'b:(base)',
   'd:(driver)',
   'C:(control)',
+  'P:(base-port)',
 ].join(''), process.argv);
 
 var base = '.strong-executor';
 var control = 'http:';
 var driver = 'direct';
+var basePort = 3000;
 
 var option;
 while ((option = parser.getopt()) !== undefined) {
@@ -57,6 +59,9 @@ while ((option = parser.getopt()) !== undefined) {
       break;
     case 'C':
       control = option.optarg;
+      break;
+    case 'P':
+      basePort = Number(option.optarg) || basePort;
       break;
     default:
       console.error('Invalid usage (near option \'%s\'), try `%s --help`.',
@@ -84,6 +89,7 @@ control = defaults(control, {
 
 
 var exec = new Executor({
+  basePort: basePort,
   cmdName: $0,
   control: control,
   driver: driver,
