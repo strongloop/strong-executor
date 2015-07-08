@@ -1,4 +1,5 @@
 var Container = require('../lib/container');
+var EventEmitter = require('events').EventEmitter;
 var debug = require('debug')('strong-executor:test');
 var fmt = require('util').format;
 var fs = require('fs');
@@ -7,6 +8,21 @@ var path = require('path');
 var pump = require('pump');
 var tap = require('tap');
 var url = require('url');
+var util = require('util');
+
+function MockProcess(pid) {
+  EventEmitter.call(this);
+  this.pid = pid;
+}
+util.inherits(MockProcess, EventEmitter);
+
+MockProcess.prototype.kill = function(sig) {
+  var self = this;
+  setImmediate(function() {
+    self.emit('exit', 'signalled', sig);
+  });
+  return true;
+};
 
 tap.test('constructor', function(t) {
   var ws = 'ws://exec-token@some.host:8765/executor-control';
@@ -74,6 +90,157 @@ tap.test('download', function(t) {
 
     pump(fs.createReadStream(path.resolve(__dirname, 'package.tgz')), res);
   });
+});
+
+tap.test('stop', function(t) {
+  var ws = 'ws://exec-token@some.host:8765/executor-control';
+  var container = new Container({
+    control: ws,
+    deploymentId: 12345,
+    env: {PORT: 3003},
+    fork: fork,
+    id: 3,
+    options: {size: 9},
+    token: 'sched-token',
+  });
+
+  container._download = function(callback) {
+    callback();
+  };
+
+  var expectFork = true;
+  container.start(function(err) {
+    t.ifError(err);
+
+    // should not restart
+    expectFork = false;
+    container.stop({}, function(err, reason) {
+      t.ifError(err);
+      t.equal(reason, 'SIGTERM');
+      t.end();
+    });
+  });
+
+  var pid = 9876;
+  function fork() {
+    t.assert(expectFork, 'should new process be forked? ' + expectFork);
+    return new MockProcess(pid++);
+  }
+});
+
+tap.test('restart', function(t) {
+  var ws = 'ws://exec-token@some.host:8765/executor-control';
+  var pid = 9876;
+  var container = new Container({
+    control: ws,
+    deploymentId: 12345,
+    env: {PORT: 3003},
+    fork: fork,
+    id: 3,
+    options: {size: 9},
+    token: 'sched-token',
+  });
+
+  container._download = function(callback) {
+    callback();
+  };
+
+  var expectFork = true;
+  container.start(function(err) {
+    t.ifError(err);
+    t.equal(pid, 9877);
+
+    // should not restart
+    expectFork = true;
+    container.restart({}, function(err) {
+      t.ifError(err);
+      t.equal(pid, 9878);
+      t.end();
+    });
+  });
+
+  function fork() {
+    t.assert(expectFork, 'should new process be forked? ' + expectFork);
+    return new MockProcess(++pid);
+  }
+});
+
+tap.test('soft-stop (succesful)', function(t) {
+  var ws = 'ws://exec-token@some.host:8765/executor-control';
+  var container = new Container({
+    control: ws,
+    deploymentId: 12345,
+    env: {PORT: 3003},
+    fork: fork,
+    id: 3,
+    options: {size: 9},
+    token: 'sched-token',
+  });
+
+  container._download = function(callback) {
+    callback();
+  };
+
+  var expectFork = true;
+  container.start(function(err) {
+    t.ifError(err);
+
+    // should not restart
+    expectFork = false;
+    process.nextTick(function() {
+      proc.emit('exit', 'soft-stopped', null);
+    });
+
+    container.stop({soft: true, timeout: 1000}, function(err, reason) {
+      t.ifError(err);
+      t.equal(reason, 'soft-stopped');
+      t.end();
+    });
+  });
+
+  var pid = 9876;
+  var proc = null;
+  function fork() {
+    t.assert(expectFork, 'should new process be forked? ' + expectFork);
+    proc = new MockProcess(pid++);
+    return proc;
+  }
+});
+
+tap.test('soft-stop (timeout)', function(t) {
+  var ws = 'ws://exec-token@some.host:8765/executor-control';
+  var container = new Container({
+    control: ws,
+    deploymentId: 12345,
+    env: {PORT: 3003},
+    fork: fork,
+    id: 3,
+    options: {size: 9},
+    token: 'sched-token',
+  });
+
+  container._download = function(callback) {
+    callback();
+  };
+
+  var expectFork = true;
+  container.start(function(err) {
+    t.ifError(err);
+
+    // should not restart
+    expectFork = false;
+    container.stop({soft: true, timeout: 50}, function(err, reason) {
+      t.ifError(err);
+      t.equal(reason, 'SIGTERM');
+      t.end();
+    });
+  });
+
+  var pid = 9876;
+  function fork() {
+    t.assert(expectFork, 'should new process be forked? ' + expectFork);
+    return new MockProcess(pid++);
+  }
 });
 
 // XXX tap.test
