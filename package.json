@@ -36,7 +36,7 @@
     "pump": "^1.0.0",
     "request": "^2.57.0",
     "strong-control-channel": "^2.x",
-    "strong-supervisor": "^2.0.2",
+    "strong-supervisor": "^3.x",
     "strong-url-defaults": "^1.0.0",
     "tar": "^2.1.1"
   }
