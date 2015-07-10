@@ -8,7 +8,8 @@
   },
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore . && jscs .",
-    "test": "tap --timeout=200 test/test-*.*"
+    "test": "tap --coverage --coverage-report=cobertura --timeout=200 test/test-*.*",
+    "posttest": "nyc report --reporter=lcov && nyc report"
   },
   "repository": {
     "type": "git",
@@ -26,6 +27,7 @@
     "express": "^4.12.4",
     "express-ws": "^0.2.6",
     "jscs": "^1.13.1",
+    "nyc": "^3.0.0",
     "tap": "^1.1.0"
   },
   "dependencies": {
