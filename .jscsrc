@@ -1,5 +1,5 @@
 {
-  "excludeFiles": ["node_modules/**", ".strong*/**"],
+  "excludeFiles": ["node_modules/**", ".strong*/**", "coverage/"],
   "disallowMixedSpacesAndTabs": true,
   "disallowKeywordsOnNewLine": [],
   "requireCurlyBraces": [

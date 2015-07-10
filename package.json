@@ -4,11 +4,13 @@
   "description": "StrongLoop Executor",
   "main": "index.js",
   "bin": {
-    "sl-executor": "./bin/sl-executor.js"
+    "sl-executor": "./bin/sl-executor.js",
+    "sl-executor-install": "./bin/sl-executor-install.js"
   },
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore . && jscs .",
-    "test": "tap --timeout=200 test/test-*.*"
+    "test": "tap --coverage --coverage-report=cobertura --timeout=200 test/test-*.*",
+    "posttest": "nyc report --reporter=lcov && nyc report"
   },
   "repository": {
     "type": "git",
@@ -26,6 +28,7 @@
     "express": "^4.12.4",
     "express-ws": "^0.2.6",
     "jscs": "^1.13.1",
+    "nyc": "^3.0.0",
     "tap": "^1.1.0"
   },
   "dependencies": {
@@ -36,6 +39,7 @@
     "pump": "^1.0.0",
     "request": "^2.57.0",
     "strong-control-channel": "^2.x",
+    "strong-service-install": "^2.0.0-0",
     "strong-supervisor": "^3.x",
     "strong-url-defaults": "^1.0.0",
     "tar": "^2.1.1"

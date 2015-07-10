@@ -1,0 +1,24 @@
+usage: %MAIN% [options]
+
+Install the StrongLoop Mesh Executor as a service.
+
+Options:
+  -h,--help           Print this message and exit.
+  -v,--version        Print version and exit.
+  -b,--base BASE      Base directory to work in (default is $HOME of the user
+                      that executor is run as, see --user).
+  -C,--control URL    Connect to central at this URL.
+  -u,--user USER      User to run executor as (default is strong-executor).
+  -P,--base-port PORT Applications run on PORT + service ID (default 3000).
+  -n,--dry-run        Don't write any files.
+  -j,--job-file FILE  Path of Upstart job to create (default is
+                      `/etc/init/strong-executor.conf`).
+  -f,--force          Overwrite existing job file if present.
+  --upstart VERSION   Specify Upstart version, 1.4 or 0.6 (default is 1.4).
+  --systemd           Install as a systemd service, not an Upstart job.
+
+OS Service support:
+
+The --systemd and --upstart VERSION options are mutually exclusive.  If neither
+is specified, the service is installed as an Upstart job using a template that
+assumes Upstart 1.4 or higher.
