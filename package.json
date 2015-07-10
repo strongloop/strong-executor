@@ -4,7 +4,8 @@
   "description": "StrongLoop Executor",
   "main": "index.js",
   "bin": {
-    "sl-executor": "./bin/sl-executor.js"
+    "sl-executor": "./bin/sl-executor.js",
+    "sl-executor-install": "./bin/sl-executor-install.js"
   },
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore . && jscs .",
@@ -38,6 +39,7 @@
     "pump": "^1.0.0",
     "request": "^2.57.0",
     "strong-control-channel": "^2.x",
+    "strong-service-install": "^2.0.0-0",
     "strong-supervisor": "^3.x",
     "strong-url-defaults": "^1.0.0",
     "tar": "^2.1.1"
