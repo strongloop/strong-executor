@@ -95,4 +95,13 @@ var exec = new Executor({
   driver: driver,
 });
 
-exec.start();
+console.log('%s: connecting to %s...', $0, control);
+
+exec.start(function() {
+  console.log('%s: connected to %s', $0, control);
+});
+
+exec.on('disconnect', function(err) {
+  console.error('%s: connection failed with %s', $0, err.message);
+  process.exit(1);
+});
