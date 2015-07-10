@@ -8,6 +8,13 @@ var tap = require('tap');
 
 tap.test('connect', function(t) {
   var central = new Central(onRequest, onListening);
+
+  central.client.on('new-channel', function(channel) {
+    channel.on('error', function(err) {
+      t.equal(err.message, 'disconnect');
+    });
+  });
+
   t.on('end', central.stop.bind(central));
 
   function onListening(control) {

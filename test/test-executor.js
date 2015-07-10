@@ -39,6 +39,9 @@ tap.test('executor', function(t) {
       close: function(cb) {
         setImmediate(cb);
       },
+      on: function(onError) {
+        this.onError = onError;
+      },
     };
 
     e = new Executor({
