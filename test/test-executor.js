@@ -1,15 +1,20 @@
+var EventEmitter = require('events').EventEmitter;
 var Executor = require('../lib/executor');
 var os = require('os');
 var tap = require('tap');
+var util = require('util');
 
 tap.test('executor', function(t) {
   var Channel;
   var e;
 
   function Container(options) {
+    EventEmitter.call(this);
+
     Container.options = options;
     return Container;
   }
+  util.inherits(Container, EventEmitter);
 
   Container.start = function(cb) {
     setImmediate(cb);
@@ -120,6 +125,8 @@ tap.test('executor', function(t) {
       token: 'TOKEN',
     };
 
+    Container.on = function() {};
+
     Container.start = function(cb) {
       var o = Container.options;
       t.equal(o.control, e._control);
@@ -151,6 +158,8 @@ tap.test('executor', function(t) {
       token: 'OTHER',
     };
 
+    Container.on = function() {};
+
     Container.start = function(cb) {
       var o = Container.options;
       t.equal(o.control, e._control, 'control');
@@ -161,8 +170,8 @@ tap.test('executor', function(t) {
       setImmediate(cb);
     };
 
-    Container.destroy = function(cb) {
-      t.equal(this.options.deploymentId, 'DID', 'destroy old');
+    Container.stop = function(options, cb) {
+      t.equal(this.options.deploymentId, 'DID', 'stop old');
       setImmediate(cb);
     };
 
