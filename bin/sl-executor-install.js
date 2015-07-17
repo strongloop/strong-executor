@@ -4,6 +4,7 @@ var Parser = require('posix-getopt').BasicParser;
 var fs = require('fs');
 var path = require('path');
 var slServiceInstall = require('strong-service-install');
+var url = require('url');
 
 module.exports = install;
 install.log = console.log;
@@ -59,6 +60,7 @@ function install(argv, callback) {
     executorEnv: '',
   };
 
+  var errors = 0;
   var option;
   while ((option = parser.getopt()) !== undefined) {
     switch (option.option) {
@@ -72,7 +74,7 @@ function install(argv, callback) {
         jobConfig.executorBaseDir = option.optarg;
         break;
       case 'C':
-        jobConfig.controlUrl = option.optarg;
+        jobConfig.controlUrl = option.optarg.trim();
         break;
       case 'P':
         jobConfig.executorPort = option.optarg | 0; // cast to an integer
@@ -99,19 +101,28 @@ function install(argv, callback) {
         jobConfig.systemd = true;
         break;
       default:
-        install.error('Invalid usage (near option \'%s\'), try `%s --help`.',
-          option.optopt, $0);
+        install.error('Invalid usage (near option \'%s\').', option.optopt);
         return callback(Error('usage'));
     }
   }
 
   if (parser.optind() !== argv.length) {
-    install.error('Invalid usage (extra arguments), try `%s --help`.', $0);
-    return callback(Error('usage'));
+    install.error('Invalid usage (extra arguments).');
+    errors += 1;
   }
 
   if (jobConfig.executorPort < 1) {
-    install.error('Invalid port specified, try `%s --help`.', $0);
+    install.error('Invalid port specified.');
+    errors += 1;
+  }
+
+  if (!url.parse(jobConfig.controlUrl || '').auth) {
+    install.error('Invalid control URL "%s".', jobConfig.controlUrl);
+    errors += 1;
+  }
+
+  if (errors > 0) {
+    install.error('Try `%s --help`.', install.$0);
     return callback(Error('usage'));
   }
 
