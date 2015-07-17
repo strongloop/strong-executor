@@ -52,7 +52,8 @@ tap.test('bad platform', function(t) {
   install.ignorePlatform = false;
   install.log = logTo(lines);
   install.error = logTo(lines);
-  install(installCmd('--upstart', '10.10'), function(err) {
+  var cmd = installCmd('--control', 'http://token@host', '--upstart', '10.10');
+  install(cmd, function(err) {
     var output = lines.join('\n');
     t.match(err, Error(), 'should fail');
     t.match(output, /Unsupported platform/i, 'should complain about platform');
@@ -96,6 +97,30 @@ tap.test('bad port', function(t) {
   });
 });
 
+tap.test('bad control URL', function(t) {
+  var lines = [];
+  install.log = logTo(lines);
+  install.error = logTo(lines);
+  install(installCmd('--control', 'http://noauth-host/'), function(err) {
+    var output = lines.join('\n');
+    t.match(err, Error(), 'should fail');
+    t.match(output, /Invalid control URL/i, 'should complain about URL');
+    t.end();
+  });
+});
+
+tap.test('bad control URL', function(t) {
+  var lines = [];
+  install.log = logTo(lines);
+  install.error = logTo(lines);
+  install(installCmd('--control', 'token@host'), function(err) {
+    var output = lines.join('\n');
+    t.match(err, Error(), 'should fail');
+    t.match(output, /Invalid control URL/i, 'should complain about URL');
+    t.end();
+  });
+});
+
 tap.test('dry-run', function(t) {
   var lines = [];
   install.log = logTo(lines);
@@ -106,7 +131,7 @@ tap.test('dry-run', function(t) {
     '--force',
     '--base', __dirname,
     '--base-port', '3000',
-    '--control', 'http://localhost:8701/api',
+    '--control', 'http://token@localhost:8701',
     '--job-file', path.join(__dirname, 'upstart-test.conf')
   );
 

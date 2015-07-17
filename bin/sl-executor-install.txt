@@ -1,4 +1,4 @@
-usage: %MAIN% [options]
+usage: %MAIN% --control URL [options]
 
 Install the StrongLoop Mesh Executor as a service.
 
@@ -7,7 +7,7 @@ Options:
   -v,--version        Print version and exit.
   -b,--base BASE      Base directory to work in (default is $HOME of the user
                       that executor is run as, see --user).
-  -C,--control URL    Connect to central at this URL.
+  -C,--control URL    Connect to central at this URL (required, no default).
   -u,--user USER      User to run executor as (default is strong-executor).
   -P,--base-port PORT Applications run on PORT + service ID (default 3000).
   -n,--dry-run        Don't write any files.
