@@ -36,7 +36,7 @@ var parser = new Parser([
 ].join(''), process.argv);
 
 var base = '.strong-executor';
-var control = 'http:';
+var control;
 var driver = 'direct';
 var basePort = 3000;
 
@@ -82,6 +82,11 @@ if (parser.optind() !== process.argv.length) {
 mkdirp(base);
 process.chdir(base);
 
+if (!control) {
+  console.error('Control endpoint missing, try `%s --help`.', $0);
+  process.exit(1);
+}
+
 control = defaults(control, {
   host: '127.0.0.1',
   port: 8701,
@@ -95,9 +100,14 @@ var exec = new Executor({
   driver: driver,
 });
 
-exec.start(function() {
-  console.log('%s: connected to %s', $0, control);
-});
+try {
+  exec.start(function() {
+    console.log('%s: connected to %s', $0, control);
+  });
+} catch (err) {
+  console.error('%s: connect to %s failed: %s', $0, control, err.message);
+  process.exit(1);
+}
 
 exec.on('disconnect', function(err) {
   console.error('%s: connect to %s failed with %s', $0, control, err.message);
