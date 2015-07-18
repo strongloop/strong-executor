@@ -165,7 +165,7 @@ tap.test('restart', function(t) {
   }
 });
 
-tap.test('soft-stop (succesful)', function(t) {
+tap.test('soft-stop (successful)', function(t) {
   var ws = 'ws://exec-token@some.host:8765/executor-control';
   var container = new Container({
     control: ws,
@@ -241,6 +241,36 @@ tap.test('soft-stop (timeout)', function(t) {
     t.assert(expectFork, 'should new process be forked? ' + expectFork);
     return new MockProcess(pid++);
   }
+});
+
+tap.test('setEnv', function(t) {
+  var ws = 'ws://exec-token@some.host:8765/executor-control';
+  var c = new Container({
+    control: ws,
+    deploymentId: 12345,
+    env: {PORT: 3003},
+    id: 3,
+    options: {size: 'CPU'},
+    token: 'sched-token',
+  });
+  var env = {this: 'that'};
+
+  t.plan(3);
+
+  c.restart = function(options, cb) {
+    t.false(options.soft, 'hard restart');
+    // FIXME if this is in setImmediate/nextTick, tap exits immediately with 0,
+    // before calling the callback. A mystery, but not a problem for this test.
+    // setImmediate(function() {
+    cb(new Error('fu'));
+    //});
+  };
+
+  c.setEnv(env, function(err) {
+    t.equal(c._env, env, 'env set');
+    t.equal(err.message, 'fu', 'error pass-thru');
+    t.end();
+  });
 });
 
 // XXX tap.test

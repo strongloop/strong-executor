@@ -185,4 +185,50 @@ tap.test('executor', function(t) {
       t.end();
     });
   });
+
+  testStop('container-stop');
+  testStop('container-stop', 'no worky');
+  testStop('container-soft-stop');
+  testStop('container-soft-stop', 'failing');
+
+  testRestart('container-restart');
+  testRestart('container-restart', 'no worky');
+  testRestart('container-soft-restart');
+  testRestart('container-soft-restart', 'failing');
+
+  function testStop(cmd, rspError) {
+    return testHardSoft('stop', cmd, rspError);
+  }
+
+  function testRestart(cmd, rspError) {
+    return testHardSoft('restart', cmd, rspError);
+  }
+
+  function testHardSoft(method, cmd, rspError) {
+    var name = util.format('cmd %s %s', cmd, rspError ? 'error' : 'ok');
+    var soft = /soft/.test(cmd);
+    var cbErr = rspError ? new Error(rspError) : null;
+    var rspMessage = rspError ? rspError : 'ok';
+
+    t.test(name, function(t) {
+      var req = {
+        cmd: cmd,
+        id: 3,
+      };
+
+      Container[method] = function(options, cb) {
+        t.equal(options.soft, soft, 'soft vs hard');
+        setImmediate(cb.bind(null, cbErr));
+      };
+
+      t.plan(3);
+
+      Channel.onRequest(req, function(rsp) {
+        t.equal(rsp.error, undefined);
+        t.equal(rsp.message, rspMessage);
+        t.end();
+      });
+    });
+  }
+
 });
