@@ -15,25 +15,19 @@ tap.test('connect', function(t) {
     });
   });
 
-  t.on('end', central.stop.bind(central));
-
   function onListening(control) {
     var child = cli('--control', control);
 
     child.on('exit', function(code, signal) {
       debug('executor exit: %j', signal || code);
-      t.equal(code, 0);
+      t.equal(code, 1);
       t.end();
     });
   }
 
-  function onRequest(req, callback) {
+  function onRequest(req) {
     debug('onRequest: %j', req);
-    callback({});
-
-    central.request({cmd: 'shutdown'}, function(rsp) {
-      debug('shutdown => %j', rsp);
-    });
+    central.stop();
   }
 
 });

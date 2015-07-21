@@ -52,6 +52,7 @@ tap.test('executor', function(t) {
     e = new Executor({
       Channel: Channel,
       Container: Container,
+      basePort: 4000,
       control: 'http://token@host:66',
     });
 
@@ -65,9 +66,18 @@ tap.test('executor', function(t) {
   });
 
   t.test('stop', function(t) {
+    var ch = e._channel;
+
     e.stop(function() {
       t.ok(true, 'closed');
-      t.end();
+      e.stop(function() {
+        t.ok(true, 'closed when closed');
+        t.end();
+      });
+    });
+
+    t.on('end', function() {
+      e._channel = ch;
     });
   });
 
@@ -132,12 +142,13 @@ tap.test('executor', function(t) {
       t.equal(o.control, e._control);
       t.equal(o.deploymentId, req.deploymentId);
       t.equal(o.env.HI, req.env.HI);
+      t.equal(o.env.PORT, 4000 + req.id);
       t.equal(o.options.size, req.options.size);
       t.equal(o.token, req.token);
       setImmediate(cb);
     };
 
-    t.plan(9);
+    t.plan(10);
 
     Channel.onRequest(req, function(rsp) {
       t.equal(rsp.error, undefined);
@@ -230,5 +241,62 @@ tap.test('executor', function(t) {
       });
     });
   }
+
+  t.test('cmd container-start', function(t) {
+    var req = {
+      cmd: 'container-start',
+      id: 3,
+    };
+
+    Container.start = function(cb) {
+      t.ok(true, 'started');
+      setImmediate(cb);
+    };
+
+    t.plan(3);
+
+    Channel.onRequest(req, function(rsp) {
+      t.equal(rsp.error, undefined);
+      t.equal(rsp.message, 'ok');
+      t.end();
+    });
+  });
+
+  t.test('cmd container-set-env default PORT', function(t) {
+    var env = {
+      X: 'y',
+    };
+
+    Container.setEnv = function(_) {
+      t.equal(_.PORT, 4000 + 3);
+      t.equal(_.X, env.X);
+    };
+
+    t.plan(3);
+
+    var req = {cmd: 'container-set-env', env: env, id: 3};
+    Channel.onRequest(req, function(rsp) {
+      t.equal(rsp.message, 'ok');
+    });
+  });
+
+  t.test('cmd container-set-env user PORT', function(t) {
+    var env = {
+      X: 'y',
+      PORT: '303',
+    };
+
+    Container.setEnv = function(_) {
+      t.equal(_.PORT, env.PORT);
+      t.equal(_.X, env.X);
+    };
+
+    t.plan(3);
+
+    var req = {cmd: 'container-set-env', env: env, id: 3};
+    Channel.onRequest(req, function(rsp) {
+      t.equal(rsp.message, 'ok');
+    });
+  });
 
 });
