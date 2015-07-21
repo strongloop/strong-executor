@@ -40,6 +40,9 @@ tap.test('constructor', function(t) {
   t.equal(c.downloadUrl, downloadUrl);
   t.equal(c.controlUrl, controlUrl);
 
+  c.setStartOptions({trace: true});
+  t.equal(c._options.trace, true);
+
   t.end();
 });
 

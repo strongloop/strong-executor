@@ -66,9 +66,18 @@ tap.test('executor', function(t) {
   });
 
   t.test('stop', function(t) {
+    var ch = e._channel;
+
     e.stop(function() {
       t.ok(true, 'closed');
-      t.end();
+      e.stop(function() {
+        t.ok(true, 'closed when closed');
+        t.end();
+      });
+    });
+
+    t.on('end', function() {
+      e._channel = ch;
     });
   });
 
@@ -232,6 +241,26 @@ tap.test('executor', function(t) {
       });
     });
   }
+
+  t.test('cmd container-start', function(t) {
+    var req = {
+      cmd: 'container-start',
+      id: 3,
+    };
+
+    Container.start = function(cb) {
+      t.ok(true, 'started');
+      setImmediate(cb);
+    };
+
+    t.plan(3);
+
+    Channel.onRequest(req, function(rsp) {
+      t.equal(rsp.error, undefined);
+      t.equal(rsp.message, 'ok');
+      t.end();
+    });
+  });
 
   t.test('cmd container-set-env default PORT', function(t) {
     var env = {
