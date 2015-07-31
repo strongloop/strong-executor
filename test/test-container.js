@@ -31,7 +31,7 @@ tap.test('constructor', function(t) {
   var c = new Container({
     control: ws,
     deploymentId: 12345,
-    env: {PORT: 3003},
+    env: {PORT: '3003'},
     id: 3,
     options: {size: 'CPU'},
     token: 'sched-token',
@@ -42,6 +42,7 @@ tap.test('constructor', function(t) {
 
   c.setStartOptions({trace: true});
   t.equal(c._options.trace, true);
+  t.equal(c.port, 3003);
 
   t.end();
 });
@@ -256,9 +257,12 @@ tap.test('setEnv', function(t) {
     options: {size: 'CPU'},
     token: 'sched-token',
   });
-  var env = {this: 'that'};
+  var env = {
+    this: 'that',
+    PORT: '3005',
+  };
 
-  t.plan(3);
+  t.plan(4);
 
   c.restart = function(options, cb) {
     t.false(options.soft, 'hard restart');
@@ -272,6 +276,7 @@ tap.test('setEnv', function(t) {
   c.setEnv(env, function(err) {
     t.equal(c._env, env, 'env set');
     t.equal(err.message, 'fu', 'error pass-thru');
+    t.equal(c.port, 3005, 'port');
     t.end();
   });
 });

@@ -142,7 +142,7 @@ tap.test('executor', function(t) {
       t.equal(o.control, e._control);
       t.equal(o.deploymentId, req.deploymentId);
       t.equal(o.env.HI, req.env.HI);
-      t.equal(o.env.PORT, 4000 + req.id);
+      t.equal(o.env.PORT, 4001, 'lowest unused port');
       t.equal(o.options.size, req.options.size);
       t.equal(o.token, req.token);
       setImmediate(cb);
