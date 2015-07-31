@@ -43,6 +43,7 @@ function install(argv, callback) {
       'f(force)',
       'U:(upstart)',
       's(systemd)',
+      'A:(svc-addr)',
     ].join(''),
     argv);
 
@@ -58,6 +59,7 @@ function install(argv, callback) {
     systemd: false,
     env: {},
     executorEnv: '',
+    svcAddr: null,
   };
 
   var errors = 0;
@@ -99,6 +101,9 @@ function install(argv, callback) {
         break;
       case 's':
         jobConfig.systemd = true;
+        break;
+      case 'A':
+        jobConfig.svcAddr = option.optarg;
         break;
       default:
         install.error('Invalid usage (near option \'%s\').', option.optopt);
@@ -148,6 +153,9 @@ function install(argv, callback) {
     // relative to CWD, which defaults to $HOME of user that executor runs as
     '--base', jobConfig.executorBaseDir || '.',
   ];
+
+  if (jobConfig.svcAddr)
+    jobConfig.command.push('--svc-addr', jobConfig.svcAddr);
 
   return install.slServiceInstall(jobConfig, report);
 

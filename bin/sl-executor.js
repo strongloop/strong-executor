@@ -33,12 +33,14 @@ var parser = new Parser([
   'd:(driver)',
   'C:(control)',
   'P:(base-port)',
+  'A:(svc-addr)',
 ].join(''), process.argv);
 
 var base = '.strong-executor';
 var control;
 var driver = 'direct';
 var basePort = 3000;
+var svcAddr = null;
 
 var option;
 while ((option = parser.getopt()) !== undefined) {
@@ -62,6 +64,9 @@ while ((option = parser.getopt()) !== undefined) {
       break;
     case 'P':
       basePort = Number(option.optarg) || basePort;
+      break;
+    case 'A':
+      svcAddr = option.optarg;
       break;
     default:
       console.error('Invalid usage (near option \'%s\'), try `%s --help`.',
@@ -98,6 +103,7 @@ var exec = new Executor({
   cmdName: $0,
   control: control,
   driver: driver,
+  svcAddr: svcAddr,
 });
 
 try {

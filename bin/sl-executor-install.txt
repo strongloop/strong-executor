@@ -10,6 +10,9 @@ Options:
   -C,--control URL    Connect to central at this URL (required, no default).
   -u,--user USER      User to run executor as (default is strong-executor).
   -P,--base-port PORT Applications run on PORT + instance ID (default 3000).
+  -A,--svc-addr ADDR  Address to use when routing traffic to services hosted
+                      on this executor. (default: IP of the interface
+                      used to connect to the Central server)
   -n,--dry-run        Don't write any files.
   -j,--job-file FILE  Path of Upstart job to create (default is
                       `/etc/init/strong-executor.conf`).
