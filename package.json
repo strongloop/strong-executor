@@ -40,6 +40,7 @@
     "pump": "^1.0.0",
     "request": "^2.57.0",
     "strong-control-channel": "^2.x",
+    "strong-mesh-models": "^8.x",
     "strong-service-install": "^2.0.0-0",
     "strong-supervisor": "^3.x",
     "strong-url-defaults": "^1.0.0",

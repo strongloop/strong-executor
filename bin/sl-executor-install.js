@@ -5,6 +5,7 @@ var fs = require('fs');
 var path = require('path');
 var slServiceInstall = require('strong-service-install');
 var url = require('url');
+var Client = require('strong-mesh-models').Client;
 
 module.exports = install;
 install.log = console.log;
@@ -13,6 +14,7 @@ install.platform = process.platform;
 install.$0 = process.env.CMD || path.basename(process.argv[1]);
 install.execPath = process.execPath;
 install.slServiceInstall = slServiceInstall;
+install.Client = null;
 
 if (require.main === module) {
   install(process.argv, function(err) {
@@ -121,7 +123,8 @@ function install(argv, callback) {
     errors += 1;
   }
 
-  if (!url.parse(jobConfig.controlUrl || '').auth) {
+  var auth = url.parse(jobConfig.controlUrl || '').auth;
+  if (!auth) {
     install.error('Invalid control URL "%s".', jobConfig.controlUrl);
     errors += 1;
   }
@@ -145,19 +148,53 @@ function install(argv, callback) {
     jobConfig.dirs = [jobConfig.executorBaseDir];
   }
 
-  jobConfig.command = [
-    install.execPath,
-    require.resolve('./sl-executor'),
-    '--control', jobConfig.controlUrl,
-    '--base-port', jobConfig.executorPort,
-    // relative to CWD, which defaults to $HOME of user that executor runs as
-    '--base', jobConfig.executorBaseDir || '.',
-  ];
+  // Skip creation of new executor if a token was provided
+  if (auth.indexOf(':') === -1) {
+    install.log('Installing with existing token: %s', auth);
+    return installWithToken(auth);
+  }
 
-  if (jobConfig.svcAddr)
-    jobConfig.command.push('--svc-addr', jobConfig.svcAddr);
+  // Register executor and use token in final control URL
+  var _Client = install.Client || Client;
+  var client = new _Client(jobConfig.controlUrl);
+  client.checkRemoteApiSemver(function(err) {
+    if (err) return report(err);
+    client.executorCreate('executor', function(err, result) {
+      if (err) {
+        if (err.syscall) {
+          // Provide a more user friendly error for network connection issues
+          install.error('Invalid control URL "%s".', jobConfig.controlUrl);
+          install.error('Try `%s --help`.', install.$0);
+          return callback(Error('usage'));
+        }
+        return report(err);
+      }
+      install.log('Registered Executor id: %s token: %s',
+        result.id, result.token);
+      installWithToken(result.token);
+    });
+  });
 
-  return install.slServiceInstall(jobConfig, report);
+  function installWithToken(token) {
+    var controlUrl = url.parse(jobConfig.controlUrl);
+    controlUrl.auth = token;
+    jobConfig.controlUrl = url.format(controlUrl);
+
+    jobConfig.command = [
+      install.execPath,
+      require.resolve('./sl-executor'),
+      '--control', jobConfig.controlUrl,
+      '--base-port', jobConfig.executorPort,
+      // relative to CWD, which defaults to $HOME of user that
+      // executor runs as
+      '--base', jobConfig.executorBaseDir || '.',
+    ];
+
+    if (jobConfig.svcAddr)
+      jobConfig.command.push('--svc-addr', jobConfig.svcAddr);
+
+    return install.slServiceInstall(jobConfig, report);
+  }
 
   function report(err) {
     if (err) {
