@@ -34,6 +34,7 @@
   "dependencies": {
     "async": "^1.2.1",
     "debug": "^2.2.0",
+    "lodash": "^3.10.0",
     "mkdirp": "^0.5.1",
     "posix-getopt": "^1.1.0",
     "pump": "^1.0.0",
