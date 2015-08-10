@@ -4,10 +4,20 @@ var exec = require('child_process').exec;
 var fmt = require('util').format;
 var install = require('../bin/sl-executor-install');
 var path = require('path');
+var slServiceInstall = require('strong-service-install');
 var tap = require('tap');
 
 var user = 'nobody';
 var group = 'nobody';
+
+function MockClient() {
+}
+MockClient.prototype.checkRemoteApiSemver = function(cb) {
+  return cb();
+};
+MockClient.prototype.executorCreate = function(driver, cb) {
+  cb(null, {token: 'abcd'});
+};
 
 tap.test('setup', function(t) {
   t.plan(2);
@@ -52,11 +62,13 @@ tap.test('bad platform', function(t) {
   install.ignorePlatform = false;
   install.log = logTo(lines);
   install.error = logTo(lines);
+  install.Client = MockClient;
   var cmd = installCmd('--control', 'http://token@host', '--upstart', '10.10');
   install(cmd, function(err) {
     var output = lines.join('\n');
     t.match(err, Error(), 'should fail');
     t.match(output, /Unsupported platform/i, 'should complain about platform');
+    install.Client = null;
     t.end();
   });
 });
@@ -121,11 +133,14 @@ tap.test('bad control URL', function(t) {
   });
 });
 
-tap.test('dry-run', function(t) {
+tap.test('dry-run with token', function(t) {
+  t.plan(4);
+
   var lines = [];
   install.log = logTo(lines);
   install.error = logTo(lines);
   install.ignorePlatform = true;
+  install.Client = MockClient;
   var args = installCmd(
     '--dry-run',
     '--force',
@@ -135,12 +150,60 @@ tap.test('dry-run', function(t) {
     '--job-file', path.join(__dirname, 'upstart-test.conf')
   );
 
+  install.slServiceInstall = function(args) {
+    t.deepEqual(args.command, [
+      install.execPath,
+      path.resolve(__dirname, '../bin/sl-executor.js'),
+      '--control', 'http://token@localhost:8701/',
+      '--base-port', 3000,
+      '--base', __dirname,
+    ]);
+    slServiceInstall.apply(this, arguments);
+  };
+
   install(args, function(err) {
     var output = lines.join('\n');
     t.ifError(err, 'should not fail');
     t.match(output, /dry-run mode/i, 'should notice dry-run mode');
     t.match(output, /strong-executor installed/, 'should claim success');
-    t.end();
+    install.Client = null;
+  });
+});
+
+tap.test('dry-run with API auth', function(t) {
+  t.plan(4);
+
+  var lines = [];
+  install.log = logTo(lines);
+  install.error = logTo(lines);
+  install.ignorePlatform = true;
+  install.Client = MockClient;
+  var args = installCmd(
+    '--dry-run',
+    '--force',
+    '--base', __dirname,
+    '--base-port', '3000',
+    '--control', 'http://user:pass@localhost:8701',
+    '--job-file', path.join(__dirname, 'upstart-test.conf')
+  );
+
+  install.slServiceInstall = function(args) {
+    t.deepEqual(args.command, [
+      install.execPath,
+      path.resolve(__dirname, '../bin/sl-executor.js'),
+      '--control', 'http://abcd@localhost:8701/',
+      '--base-port', 3000,
+      '--base', __dirname,
+    ]);
+    slServiceInstall.apply(this, arguments);
+  };
+
+  install(args, function(err) {
+    var output = lines.join('\n');
+    t.ifError(err, 'should not fail');
+    t.match(output, /dry-run mode/i, 'should notice dry-run mode');
+    t.match(output, /strong-executor installed/, 'should claim success');
+    install.Client = null;
   });
 });
 

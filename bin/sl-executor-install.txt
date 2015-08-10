@@ -8,6 +8,10 @@ Options:
   -b,--base BASE      Base directory to work in (default is $HOME of the user
                       that executor is run as, see --user).
   -C,--control URL    Connect to central at this URL (required, no default).
+                      If the control URL provides Central API credentials, a new
+                      Executor will be registered. In order to link to an
+                      existing Executor, provide the token for that executor as
+                      part of the URL.
   -u,--user USER      User to run executor as (default is strong-executor).
   -P,--base-port PORT Applications run on PORT + instance ID (default 3000).
   -A,--svc-addr ADDR  Address to use when routing traffic to services hosted
