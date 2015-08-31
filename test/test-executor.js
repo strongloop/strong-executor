@@ -25,38 +25,45 @@ tap.test('executor', function(t) {
   };
 
   t.test('start', function(t) {
-    Channel = {
-      connect: function(onRequest, uri) {
-        this.onRequest = onRequest;
+    Channel = new EventEmitter();
+    Channel.connect = function(onRequest, uri) {
+      this.onRequest = onRequest;
+      this._socket = {
+        address: function() {
+          return {host: '127.0.0.1', port: 66};
+        },
+      };
 
-        t.equal(uri, e._control);
-        return this;
-      },
-      request: function(req, cb) {
-        t.match(req, {
-          cmd: 'starting',
-          hostname: os.hostname(),
-          cpus: os.cpus().length,
-          driver: 'direct',
-        });
-        setImmediate(cb.bind(null, {message: 'OK'}));
-      },
-      close: function(cb) {
-        setImmediate(cb);
-      },
-      on: function(onError) {
-        this.onError = onError;
-      },
+      t.equal(uri, e._control);
+      setImmediate(function() {
+        Channel.emit('connect');
+      });
+      return this;
+    };
+    Channel.request = function(req, cb) {
+      t.match(req, {
+        cmd: 'starting',
+        hostname: os.hostname(),
+        cpus: os.cpus().length,
+        address: 'some-host',
+        driver: 'direct',
+      });
+      setImmediate(cb.bind(null, {message: 'OK'}));
+    };
+    Channel.close = function(cb) {
+      setImmediate(cb);
     };
 
     e = new Executor({
       Channel: Channel,
       Container: Container,
       basePort: 4000,
-      control: 'http://token@host:66',
+      control: 'http://token@some-host:66',
+      driver: 'direct',
+      svcAddr: 'some-host',
     });
 
-    t.equal(e._control, 'ws://token@host:66/executor-control');
+    t.equal(e._control, 'ws://token@some-host:66/executor-control');
 
     e.start(function(err, rsp) {
       t.ifError(err);
@@ -299,4 +306,5 @@ tap.test('executor', function(t) {
     });
   });
 
+  t.end();
 });

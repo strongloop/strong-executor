@@ -33,4 +33,6 @@ tap.test('executor', function(t) {
     t.equal(e._unusedPort(), 4002, 'second');
     t.end();
   });
+
+  t.end();
 });
