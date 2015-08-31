@@ -299,4 +299,5 @@ tap.test('executor', function(t) {
     });
   });
 
+  t.end();
 });
