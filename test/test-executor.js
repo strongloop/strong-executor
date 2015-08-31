@@ -45,7 +45,7 @@ tap.test('executor', function(t) {
         cmd: 'starting',
         hostname: os.hostname(),
         cpus: os.cpus().length,
-        address: 'host',
+        address: 'some-host',
         driver: 'direct',
       });
       setImmediate(cb.bind(null, {message: 'OK'}));
@@ -58,12 +58,12 @@ tap.test('executor', function(t) {
       Channel: Channel,
       Container: Container,
       basePort: 4000,
-      control: 'http://token@host:66',
+      control: 'http://token@some-host:66',
       driver: 'direct',
-      svcAddr: 'host',
+      svcAddr: 'some-host',
     });
 
-    t.equal(e._control, 'ws://token@host:66/executor-control');
+    t.equal(e._control, 'ws://token@some-host:66/executor-control');
 
     e.start(function(err, rsp) {
       t.ifError(err);
