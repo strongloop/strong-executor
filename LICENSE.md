@@ -1,3 +1,5 @@
+Copyright (c) 2013-2015 StrongLoop, Inc.
+
 StrongLoop License
 
 STRONGLOOP SUBSCRIPTION AGREEMENT
