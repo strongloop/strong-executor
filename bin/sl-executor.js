@@ -1,4 +1,9 @@
 #!/usr/bin/env node
+// Copyright IBM Corp. 2015. All Rights Reserved.
+// Node module: strong-executor
+// US Government Users Restricted Rights - Use, duplication or disclosure
+// restricted by GSA ADP Schedule Contract with IBM Corp.
+
 'use strict';
 
 // Exit on loss of parent process, if it had established an ipc control channel.
