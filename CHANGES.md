@@ -1,3 +1,11 @@
+2016-05-06, Version 1.1.3
+=========================
+
+ * update copyright notices and license (Ryan Graham)
+
+ * Refer to licenses with a link (Sam Roberts)
+
+
 2015-10-01, Version 1.1.2
 =========================
 
