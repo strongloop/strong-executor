@@ -10,7 +10,9 @@
   "scripts": {
     "pretest": "eslint --ignore-path .gitignore . && jscs .",
     "test": "tap --coverage --bail --coverage-report=cobertura --timeout=200 test/test-*.*",
-    "posttest": "nyc report --reporter=lcov && nyc report"
+    "posttest": "nyc report --reporter=lcov && nyc report",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -44,6 +46,8 @@
     "strong-service-install": "^2.0.0-0",
     "strong-supervisor": "^3.x",
     "strong-url-defaults": "^1.0.0",
-    "tar": "^2.1.1"
-  }
+    "tar": "^2.1.1",
+    "snyk": "^1.85.0"
+  },
+  "snyk": true
 }
